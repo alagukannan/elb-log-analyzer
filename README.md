@@ -3,8 +3,10 @@
 [![Travis](https://travis-ci.org/ozantunca/elb-log-analyzer.svg?branch=master)](https://travis-ci.org/ozantunca/elb-log-analyzer)
 [![Snyk](https://snyk.io/test/npm/elb-log-analyzer/badge.svg)](https://snyk.io/test/npm/elb-log-analyzer)
 
-ELB log analyzer is a command line tool for parsing Elastic Load Balancer's access logs and getting quick statistics. Useful for detecting requests taking longest time, IPs making most requests and many other data that can be derived from log files. If you need help bulk downloading logs from your S3 bucket, try [elblogs](https://github.com/namirali/elblogs).
+ELB log analyzer is a command line tool for parsing Elastic Load Balancer's access logs and getting quick statistics. Useful for detecting requests taking longest time, IPs making most requests and many other data that can be derived from log files. In addition to command line usage, the analyzer can also be used as a *library*. If you need help bulk downloading logs from your S3 bucket, try [elblogs](https://github.com/namirali/elblogs).
 
+## Requirements
+- Node.js version 0.12 or higher
 
 ## Installation
 ```sh
@@ -189,6 +191,28 @@ Example Output:
 v0.3.0
 ```
 
+### Library Mode
+As of version v1.0, log analyzer can be used as a library in addition to it's command line usage described above. Usage is pretty similar to CLI. Installation of library mode is same as CLI but needs to be installed locally like it's seen below.
+```sh
+npm install elb-log-analyzer
+```
+Example usage with arguments
+```js
+const analyzer = require('elb-log-analyzer')
+
+analyzer({
+  files: ['logs/', 'AWSlogs.log', 'AWSlogs2.log'], // files or folders that log files are located.
+  sortBy: 1, // column index to be sorted. Be aware that first index is 0. Default is also 0.
+  start: new Date('2016-06-05'), // returns results after given date. argument should be a date object
+  end: new Date('2016-06-06'), // returns results before given date. argument should be a date object
+  prefixes: [null, 'https'], // columns should start with given strings. `null` is ignored but second column will start with 'https'
+  limit: 25, // number of items in the result set
+  cols: ['count', 'requested_resource', 'client'], // columns to be returned
+  ascending: true, // sort direction
+  onStart: (filenames) => {}, // called when all log files are discovered and processing starts. Also gives names of files that will be processed.
+  onProgress: () => {}, // called when analyzer is done reading a file. Will be called multiple times until all files are complete.
+})
+```
+
 #### Roadmap
-- Will be usable as a library in addition to CLI usage
 - CLI will run multiple clusters to speed up the process and escape from memory limitations
