@@ -28,9 +28,13 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
+var _url = require('url');
+
+var _S = require('string');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var FIELDS = ['timestamp', 'elb', 'client:port', 'client', 'backend:port', 'backend', 'request_processing_time', 'backend_processing_time', 'response_processing_time', 'elb_status_code', 'backend_status_code', 'received_bytes', 'sent_bytes', 'request', 'requested_resource', 'user_agent', 'total_time', 'count'];
+var FIELDS = ['timestamp', 'elb', 'client:port', 'client', 'backend:port', 'backend', 'request_processing_time', 'backend_processing_time', 'response_processing_time', 'elb_status_code', 'backend_status_code', 'received_bytes', 'sent_bytes', 'request', 'requested_resource','requested_pathname', 'user_agent', 'total_time', 'count'];
 
 module.exports = function (_ref) {
   var _ref$logs = _ref.logs,
@@ -324,7 +328,7 @@ function parseLine(line) {
   for (var i = 14; i < ATTRIBUTES.length - 2; i++) {
     user_agent = user_agent + ATTRIBUTES[i] + " ";
   }
-
+  //console.log(_S(ATTRIBUTES[12]).isEmpty() ? '' : _S(_url.parse(ATTRIBUTES[12]).pathname).isEmpty() ? '' :  _S(_url.parse(ATTRIBUTES[12]).pathname).ensureRight('/').s.toLowerCase());
   return {
     'timestamp': ATTRIBUTES[0],
     'elb': ATTRIBUTES[1],
@@ -341,9 +345,11 @@ function parseLine(line) {
     'sent_bytes': ATTRIBUTES[10],
     'request': ATTRIBUTES[11] + ' ' + ATTRIBUTES[12] + ' ' + ATTRIBUTES[13],
     'requested_resource': ATTRIBUTES[12],
+    'requested_pathname': _S(ATTRIBUTES[12]).isEmpty() ? '' : _S(_url.parse(ATTRIBUTES[12]).pathname).isEmpty() ? '' :  _S(_url.parse(ATTRIBUTES[12]).pathname).ensureRight('/').s.toLowerCase(),
     user_agent: user_agent,
     'total_time': parseFloat(ATTRIBUTES[4]) + parseFloat(ATTRIBUTES[5]) + parseFloat(ATTRIBUTES[6])
   };
+  
 }
 
 function filterByDate(line, start, end) {
